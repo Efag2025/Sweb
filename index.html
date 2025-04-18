@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1024">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel do Aluno - EFAG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background-color: #f8f9fa; display: flex; flex-direction: column; min-height: 100vh; }
+    .header { background-color: #f0f2f5; padding: 20px; color: #080943; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .header img { height: 120px; }
+    .header h1 { font-size: 24px; margin: 0; }
+    .search-container { position: relative; margin-left: auto; flex-shrink: 0; }
+    .search-container input { padding: 10px 35px 10px 14px; border-radius: 8px; border: 1px solid #ccc; outline: none; font-size: 15px; width: 400px; }
+    .search-container i { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #888; }
+    .container { display: flex; flex: 1; }
+    .sidebar { width: 230px; background-color: #2c3e50; padding-top: 20px; min-height: 100vh; color: white; position: sticky; top: 0; }
+    .sidebar a { display: flex; align-items: center; gap: 10px; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); transition: background 0.3s; }
+    .sidebar a:hover { background-color: #34495e; }
+    .main-content { flex: 1; padding: 30px; }
+    .info-box { background-color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+    .info-box h2 { margin-bottom: 15px; color: #1d3557; }
+    .info-box p { margin: 8px 0; font-size: 16px; }
+    .disciplinas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; padding: 10px 0; }
+    .disciplina-card { background-color: #e9ecef; border-radius: 10px; padding: 14px 12px; font-weight: 600; color: #1d3557; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08); min-height: 90px; display: flex; align-items: center; justify-content: center; text-align: center; text-wrap: balance; }
+    .disciplina-card:hover { background-color: #dee2e6; transform: translateY(-3px); }
+    #calendar { max-width: 350px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      .sidebar { width: 100%; position: relative; }
+      .main-content { padding: 20px; }
+      .search-container { width: 100%; margin-left: 0; margin-top: 10px; }
+      .search-container input { width: 100%; }
+      
+    }
+    
+    /* Aplica cursor e efeito hover nos dias do calendário */
+.fc-daygrid-day-frame {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.fc-daygrid-day-frame:hover {
+  background-color: #cce5ff !important; /* azul clarinho */
+  border-radius: 6px;
+}
+/* Classe para destacar a data clicada */
+.data-selecionada {
+  background-color: #007bff !important;
+  color: white;
+  border-radius: 6px;
+}
+.fc-toolbar.fc-header-toolbar {
+  justify-content: start !important; /* Alinha à esquerda */
+  gap: 20px;                         /* Espaço entre botão e título */
+}
+
+#btn-topo {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #1d3557 ;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 12px 15px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  display: none; /* começa escondido */
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  #btn-topo {
+    display: block;
+  }
+}
+
+#info {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.perfil-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  flex: 1;
+  min-width: 280px;
+}
+
+.perfil-header h2 {
+  margin-bottom: 10px;
+  color: #1d3557;
+  font-size: 24px;
+}
+
+.perfil-dados p {
+  margin: 10px 0;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #333;
+}
+
+.perfil-dados p i {
+  color: #1d3557;
+}
+#btnContato {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #1d3557;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 14px 17px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  z-index: 999;
+}
+@media (max-width: 768px) {
+  #btnContato {
+    bottom: 90px; /* sobe acima do botão de topo */
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+
+  .popup-contato {
+    bottom: 150px; /* acompanha o botão mais alto */
+    right: 10px;
+    width: 90%;
+  }
+}
+
+
+
+.popup-contato {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 300px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  display: none;
+  flex-direction: column;
+  z-index: 999;
+}
+
+.popup-contato h3 {
+  margin-bottom: 10px;
+  color: #1d3557;
+}
+
+.popup-contato input,
+.popup-contato textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.popup-contato textarea {
+  height: 80px;
+  resize: none;
+}
+
+.botoes-popup {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.botoes-popup button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.botoes-popup button:first-child {
+  background-color: #28a745;
+  color: white;
+}
+
+.botoes-popup button:last-child {
+  background-color: #6c757d;
+  color: white;
+}
+
+  </style>
+</head>
+<body>  <div class="header">
+    <img src="efag-logo-transparente.png" alt="EFAG Logo" />
+    <h1 id="titulo-bemvindo">Bem-vindo</h1>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Pesquisar no sistema...">
+      <i class="fas fa-search"></i>
+    </div>
+  </div>
+  <div class="container">
+    <div class="sidebar">
+      <a href="#" onclick="showSection('info')"><i class="fas fa-user"></i> Informações Pessoais</a>
+      <a href="#" onclick="showSection('grade')"><i class="fas fa-calendar-alt"></i> Grade de Aulas</a>
+      <a href="#" onclick="showSection('disciplinas')"><i class="fas fa-book"></i> Disciplinas</a>
+      <a href="#" onclick="showSection('notas')"><i class="fas fa-chart-line"></i> Notas</a>
+      <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</a>
+      
+    </div>    
+    <div class="main-content">
+      <div id="info" class="info-box">
+        <div style="display: flex; flex-wrap: wrap; gap: 30px;">
+      
+          <!-- Bloco 1 - Dados funcionais -->
+          <div class="perfil-box">
+            <h3 style="color:#1d3557; margin-bottom: 15px;">📋 Informações do Aluno</h3>
+            <p><i class="fas fa-user-tag"></i><strong> QRA:</strong> <span id="qraAluno">—</span></p>
+            <p><i class="fas fa-id-badge"></i><strong> C.F:</strong> <span id="cfAluno">—</span></p>
+            <p><i class="fas fa-shield-alt"></i><strong> RE:</strong> <span id="reAluno">—</span></p>
+            <p><i class="fas fa-people-group"></i><strong> Pelotão:</strong> <span id="pelotaoAluno">—</span></p>
+            <p><i class="fas fa-envelope"></i><strong> Email:</strong> <span id="emailAluno">—</span></p>
+            <p><i class="fas fa-book"></i><strong> Curso:</strong> <span id="cursoAluno">Formação de Guardas Municipais</span></p>
+          </div>
+      
+          <!-- Bloco 2 - Dados complementares -->
+          <div class="perfil-box">
+            <h3 style="color:#1d3557; margin-bottom: 15px;">🗂 Dados Pessoais</h3>
+            <p><i class="fas fa-id-card"></i><strong> Nome completo:</strong> <span id="nomeCompleto">—</span></p>
+            <p><i class="fas fa-fingerprint"></i><strong> CPF:</strong> <span id="cpfAluno">—</span></p>
+            <p><i class="fas fa-calendar-alt"></i><strong> Nascimento:</strong> <span id="dataNascimento">—</span></p>
+            <p><i class="fas fa-map-marker-alt"></i><strong> Endereço:</strong> <span id="enderecoAluno">—</span></p>
+            <p><i class="fas fa-phone"></i><strong> Telefone:</strong> <span id="telefoneAluno">—</span></p>
+            <p><i class="fas fa-tint"></i><strong> Tipo sanguíneo:</strong> <span id="sangueAluno">—</span></p>
+          </div>
+      
+        </div>
+      </div>
+      <div id="disciplinas" class="info-box" style="display: none;">
+        <h2>Disciplinas</h2>
+        <div class="disciplinas-grid">
+          <!-- Cards das disciplinas -->
+          <div class="disciplina-card">Ambiental</div>
+          <div class="disciplina-card">APH</div>
+          <div class="disciplina-card">Armamento e Tiro</div>
+          <div class="disciplina-card">Avaliações</div>
+          <div class="disciplina-card">Atos Administrativos</div>
+          <div class="disciplina-card">Comunicação Social</div>
+          <div class="disciplina-card">Corregedoria</div>
+          <div class="disciplina-card">Direito</div>
+          <div class="disciplina-card">Direitos Humanos</div>
+          <div class="disciplina-card">Ética</div>
+          <div class="disciplina-card">Funções e Atribuições da GCM</div>
+          <div class="disciplina-card">Gestão Integrada</div>
+          <div class="disciplina-card">Guard</div>
+          <div class="disciplina-card">Instrumentos de Menor Potencial Ofensivo</div>
+          <div class="disciplina-card">Inteligência</div>
+          <div class="disciplina-card">Invasões, Manifestações e Movimentos Sociais</div>
+          <div class="disciplina-card">Língua Portuguesa</div>
+          <div class="disciplina-card">Maria da Penha</div>
+          <div class="disciplina-card">Ordem Unida</div>
+          <div class="disciplina-card">Ouvidoria</div>
+          <div class="disciplina-card">Perícia</div>
+          <div class="disciplina-card">Psicologia</div>
+          <div class="disciplina-card">Relação Jurídica do Trabalho</div>
+          <div class="disciplina-card">Responsabilidade Funcional</div>
+          <div class="disciplina-card">Segurança Patrimonial</div>
+          <div class="disciplina-card">SESMT</div>
+          <div class="disciplina-card">SINESP - CAD</div>
+          <div class="disciplina-card">Técnicas Operacionais</div>
+          <div class="disciplina-card">Trânsito</div>
+          <div class="disciplina-card">Violência Doméstica</div>
+        </div>
+      </div>
+      <div id="notas" class="info-box" style="display: none;">
+        <h2>Notas</h2>
+        <p><strong>Legislação:</strong> 8.5</p>
+        <p><strong>Técnicas:</strong> 9.0</p>
+        <p><strong>Socorros:</strong> 7.8</p>
+        <p><strong>Trânsito:</strong> 8.9</p>
+      </div>
+      <div id="grade" class="info-box" style="display: none;">
+        <h2>Grade de Aulas</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 30px;">
+          <div id="calendar"></div>
+          <div style="flex: 1;">
+            <div id="aulasDoDia" style="padding: 10px; background: #f9f9f9; border-radius: 8px;">
+              Selecione um dia no calendário.
+            </div>
+            <div style="margin-top: 10px;">
+              <button id="baixar-pdf" style="display:none; padding: 10px 15px; background-color: #b3d4fc; color: #003366; border: none; border-radius: 6px; cursor: pointer;">📄 Baixar Grade</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <!-- Modal de Detalhes da Disciplina -->
+<div id="modalDisciplina" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; justify-content:center; align-items:center;">
+  <div style="background:white; padding:25px; border-radius:10px; max-width:500px; width:90%; box-shadow:0 4px 10px rgba(0,0,0,0.3); text-align:left;">
+    <h2 id="modalTitulo">Detalhes da Disciplina</h2>
+    <p><strong>Professor:</strong> <span id="modalProfessor">—</span></p>
+    <p><strong>Carga Horária:</strong> <span id="modalCarga">—</span></p>
+    <p><strong>Material:</strong></p>
+    <div id="modalMaterial" style="margin-left:10px; margin-top:4px;">
+      Nenhum material disponível.
+    </div>
+    <div style="text-align:right; margin-top:20px;">
+      <button onclick="fecharModal()" style="padding:8px 16px; background:#2c3e50; color:white; border:none; border-radius:6px; cursor:pointer;">Fechar</button>
+    </div>
+  </div>
+</div>
+<script>
+  function fecharModal() {
+    document.getElementById('modalDisciplina').style.display = 'none';
+  }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<button id="btn-topo" onclick="scrollToTop()" title="Voltar ao topo">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Botão flutuante -->
+<button id="btnContato" onclick="abrirFormulario()" title="Contato com a Escola">
+  ✉️
+</button>
+
+<!-- Popup do formulário -->
+<div id="popupContato" class="popup-contato">
+  <h3>Fale com a Escola</h3>
+  <input type="text" id="contatoNome" placeholder="Seu nome">
+  <input type="email" id="contatoEmail" placeholder="Seu email">
+  <textarea id="contatoMensagem" placeholder="Sua solicitação..."></textarea>
+  <div class="botoes-popup">
+    <button onclick="enviarEmail()">Enviar</button>
+    <button onclick="fecharFormulario()">Cancelar</button>
+  </div>
+</div>
+
+</body>
+</html>
