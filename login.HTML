@@ -53,12 +53,13 @@
       border: 1px solid #ced4da;
       border-radius: 8px;
       font-size: 15px;
-      transition: border 0.3s ease;
+      transition: 0.3s ease;
     }
 
     .input-group input:focus {
       border-color: #0077b6;
       outline: none;
+      box-shadow: 0 0 5px rgba(0,119,182,0.2);
     }
 
     .input-group i {
@@ -81,10 +82,37 @@
       font-weight: 500;
       cursor: pointer;
       transition: background 0.3s;
+      position: relative;
     }
 
     button:hover {
       background-color: #005f8e;
+    }
+
+    .spinner {
+      border: 2px solid white;
+      border-top: 2px solid #0077b6;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -8px 0 0 -8px;
+      display: none;
+    }
+
+    .error-message {
+      color: #e63946;
+      font-size: 14px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     @keyframes fadeIn {
@@ -107,18 +135,35 @@
       <input type="password" id="password" placeholder="Senha" required />
       <i class="fa fa-lock"></i>
     </div>
-    <button onclick="login()">Entrar</button>
+    <button id="loginBtn" onclick="login()">
+      <span id="btnText">Entrar</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+    <div class="error-message" id="errorMsg">Preencha todos os campos.</div>
   </div>
 
   <script>
     function login() {
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
+      const btn = document.getElementById('loginBtn');
+      const spinner = document.getElementById('spinner');
+      const btnText = document.getElementById('btnText');
+      const errorMsg = document.getElementById('errorMsg');
+
+      errorMsg.style.display = "none";
+
       if (username && password) {
-        localStorage.setItem('nomeUsuario', username);
-        window.location.href = 'painel.html';
+        btn.disabled = true;
+        spinner.style.display = "block";
+        btnText.style.visibility = "hidden";
+
+        setTimeout(() => {
+          localStorage.setItem('nomeUsuario', username);
+          window.location.href = 'painel.html';
+        }, 1200); // Simula carregamento
       } else {
-        alert("Preencha todos os campos para continuar.");
+        errorMsg.style.display = "block";
       }
     }
   </script>
