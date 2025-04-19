@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - EFAG</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: #ffffff;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .logo img {
+      width: 110px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #2e3a59;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .input-group {
+      position: relative;
+      margin: 15px 0;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 40px 12px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border 0.3s ease;
+    }
+
+    .input-group input:focus {
+      border-color: #0077b6;
+      outline: none;
+    }
+
+    .input-group i {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #adb5bd;
+    }
+
+    button {
+      background-color: #1d3557;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #005f8e;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <img src="efag-logo-transparente.png" alt="EFAG Logo" />
+    </div>
+    <h2>Portal do Aluno</h2>
+    <div class="input-group">
+      <input type="text" id="username" placeholder="Usuário" required />
+      <i class="fa fa-user"></i>
+    </div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Senha" required />
+      <i class="fa fa-lock"></i>
+    </div>
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <script>
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      if (username && password) {
+        localStorage.setItem('nomeUsuario', username);
+        window.location.href = 'painel.html';
+      } else {
+        alert("Preencha todos os campos para continuar.");
+      }
+    }
+  </script>
+</body>
+</html>
